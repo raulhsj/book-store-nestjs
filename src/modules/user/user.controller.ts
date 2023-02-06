@@ -17,6 +17,7 @@ export class UserController {
   constructor(private readonly _userService: UserService) {}
 
   @Get(':id')
+  // ParseIntPipe converts Object param id to int id
   async getUser(@Param('id', ParseIntPipe) id: number): Promise<UserDto> {
     const user = await this._userService.get(id);
     return user;
