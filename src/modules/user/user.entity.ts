@@ -24,7 +24,7 @@ export class User extends BaseEntity {
   @Column({ type: 'varchar', nullable: false })
   email: string;
 
-  @Column({ type: 'varchar', default: 'ACTIVE', length: 20 })
+  @Column({ type: 'varchar', default: 'ACTIVE' })
   password: string;
 
   @OneToOne((type) => UserDetails, {
