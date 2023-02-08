@@ -49,4 +49,12 @@ export class UserController {
   async deleteUser(@Param('id', ParseIntPipe) id: number): Promise<void> {
     await this._userService.delete(id);
   }
+
+  @Post('setRole/role/:roleId/user/:userId')
+  async setRoleToUser(
+    @Param('userId', ParseIntPipe) userId: number,
+    @Param('roleId', ParseIntPipe) roleId: number,
+  ) {
+    return this._userService.setRoleToUser(userId, roleId);
+  }
 }

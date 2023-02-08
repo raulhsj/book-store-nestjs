@@ -70,4 +70,29 @@ export class UserService {
     }
     await this._userRepository.update(id, { status: StatusType.INACTIVE });
   }
+
+  async setRoleToUser(userId: number, roleId: number) {
+    const userExist = await this._userRepository.findOneBy({
+      id: userId,
+      status: StatusType.ACTIVE,
+    });
+
+    if (!userExist) {
+      throw new NotFoundException();
+    }
+
+    const roleExist = await this._roleRepository.findOneBy({
+      id: roleId,
+      status: StatusType.ACTIVE,
+    });
+
+    if (!roleExist) {
+      throw new NotFoundException('Role does not exist');
+    }
+
+    userExist.roles.push(roleExist);
+    await this._userRepository.save(userExist);
+
+    return true;
+  }
 }
