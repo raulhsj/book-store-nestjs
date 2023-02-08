@@ -13,7 +13,7 @@ export class AuthController {
   constructor(private readonly _authService: AuthService) {}
 
   @Post('/signUp')
-  @UsePipes(ValidationPipe)
+  @UsePipes(ValidationPipe) // Field validation in the input
   async signUp(@Body() signupDto: SignupDto): Promise<void> {
     return this._authService.signUp(signupDto);
   }

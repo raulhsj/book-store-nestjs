@@ -1,3 +1,4 @@
+import { StatusType } from '../../shared/statustype.enum';
 import {
   BaseEntity,
   Column,
@@ -18,7 +19,7 @@ export class UserDetails extends BaseEntity {
   @Column({ type: 'varchar', nullable: true })
   lastname: string;
 
-  @Column({ type: 'varchar', default: 'ACTIVE', length: 8 })
+  @Column({ type: 'varchar', default: StatusType.ACTIVE, length: 8 })
   status: string;
 
   @CreateDateColumn({ type: 'timestamp', name: 'created_at', nullable: true })

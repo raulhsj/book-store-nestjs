@@ -8,6 +8,7 @@ import { User } from './user.entity';
 import { Repository } from 'typeorm';
 import { UserDetails } from './user.details.entity';
 import { Role } from '../role/role.entity';
+import { StatusType } from '../../shared/statustype.enum';
 
 @Injectable()
 export class UserService {
@@ -23,7 +24,7 @@ export class UserService {
       throw new BadRequestException('id must be sent');
     }
     const user = await this._userRepository.findOneBy({
-      status: 'ACTIVE',
+      status: StatusType.ACTIVE,
       id,
     });
 
@@ -36,7 +37,7 @@ export class UserService {
 
   async getAll(): Promise<User[]> {
     const users: User[] = await this._userRepository.findBy({
-      status: 'ACTIVE',
+      status: StatusType.ACTIVE,
     });
 
     return users;
@@ -61,12 +62,12 @@ export class UserService {
 
   async delete(id: number): Promise<void> {
     const userExists = await this._userRepository.findOneBy({
-      status: 'ACTIVE',
+      status: StatusType.ACTIVE,
     });
 
     if (!userExists) {
       throw new NotFoundException();
     }
-    await this._userRepository.update(id, { status: 'INACTIVE' });
+    await this._userRepository.update(id, { status: StatusType.INACTIVE });
   }
 }

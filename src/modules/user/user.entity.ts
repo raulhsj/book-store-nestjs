@@ -12,6 +12,7 @@ import {
 } from 'typeorm';
 import { UserDetails } from './user.details.entity';
 import { Role } from '../role/role.entity';
+import { StatusType } from '../../shared/statustype.enum';
 
 @Entity('users')
 export class User extends BaseEntity {
@@ -24,7 +25,7 @@ export class User extends BaseEntity {
   @Column({ type: 'varchar', nullable: false })
   email: string;
 
-  @Column({ type: 'varchar', default: 'ACTIVE' })
+  @Column({ type: 'varchar', default: StatusType.ACTIVE })
   password: string;
 
   @OneToOne((type) => UserDetails, {
@@ -39,7 +40,7 @@ export class User extends BaseEntity {
   @JoinTable({ name: 'user_roles' })
   roles: Role[];
 
-  @Column({ type: 'varchar', default: 'ACTIVE', length: 8 })
+  @Column({ type: 'varchar', default: StatusType.ACTIVE, length: 8 })
   status: string;
 
   @CreateDateColumn({ type: 'timestamp', name: 'created_at' })

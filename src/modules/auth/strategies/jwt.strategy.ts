@@ -1,12 +1,11 @@
 import { PassportStrategy } from '@nestjs/passport';
-import { InjectRepository } from '@nestjs/typeorm';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Configuration } from '../../../config/config.keys';
 import { ConfigService } from '../../../config/config.service';
 import { AuthRepository } from '../auth.repository';
 import { IJwtPayload } from '../jwt-payload.interface';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { User } from 'src/modules/user/user.entity';
+import { StatusType } from '../../../shared/statustype.enum';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -25,7 +24,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     const { username } = payload;
     const user = await this._authRepository.findOneBy({
       username,
-      status: 'ACTIVE',
+      status: StatusType.ACTIVE,
     });
 
     if (!user) {
