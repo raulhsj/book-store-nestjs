@@ -7,6 +7,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Role } from './role.entity';
 import { Repository } from 'typeorm';
 import { StatusType } from '../../shared/statustype.enum';
+import { ReadRoleDto } from './dtos';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class RoleService {
@@ -15,7 +17,7 @@ export class RoleService {
     private readonly _roleRepository: Repository<Role>,
   ) {}
 
-  async get(id: number): Promise<Role> {
+  async get(id: number): Promise<ReadRoleDto> {
     if (!id) {
       throw new BadRequestException('id must be sent');
     }
@@ -28,24 +30,36 @@ export class RoleService {
       throw new NotFoundException();
     }
 
-    return role;
+    return plainToInstance(ReadRoleDto, role);
   }
 
-  async getAll(): Promise<Role[]> {
+  async getAll(): Promise<ReadRoleDto[]> {
     const roles: Role[] = await this._roleRepository.findBy({
       status: StatusType.ACTIVE,
     });
 
-    return roles;
+    return roles.map((role: Role) => plainToInstance(ReadRoleDto, role));
   }
 
-  async create(role: Role): Promise<Role> {
+  async create(role: Partial<Role>): Promise<ReadRoleDto> {
     const savedRole: Role = await this._roleRepository.save(role);
-    return savedRole;
+    return plainToInstance(ReadRoleDto, savedRole);
   }
 
-  async update(id: number, role: Role): Promise<void> {
-    await this._roleRepository.update(id, role);
+  async update(roleId: number, role: Partial<Role>): Promise<ReadRoleDto> {
+    const foundRole: Role = await this._roleRepository.findOneBy({
+      id: roleId,
+      status: StatusType.ACTIVE,
+    });
+
+    if (!foundRole) {
+      throw new NotFoundException('This role does not exist');
+    }
+
+    foundRole.name = role.name;
+    foundRole.description = role.description;
+    const updatedRole: Role = await this._roleRepository.save(foundRole);
+    return plainToInstance(ReadRoleDto, updatedRole);
   }
 
   async delete(id: number): Promise<void> {

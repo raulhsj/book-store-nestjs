@@ -6,9 +6,10 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { Repository } from 'typeorm';
-import { UserDetails } from './user.details.entity';
 import { Role } from '../role/role.entity';
 import { StatusType } from '../../shared/statustype.enum';
+import { ReadUserDto, UpdateUserDto } from './dto';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class UserService {
@@ -19,59 +20,58 @@ export class UserService {
     private readonly _roleRepository: Repository<Role>,
   ) {}
 
-  async get(id: number): Promise<User> {
-    if (!id) {
+  async get(userId: number): Promise<ReadUserDto> {
+    if (!userId) {
       throw new BadRequestException('id must be sent');
     }
     const user = await this._userRepository.findOneBy({
       status: StatusType.ACTIVE,
-      id,
+      id: userId,
     });
 
     if (!user) {
       throw new NotFoundException();
     }
 
-    return user;
+    return plainToInstance(ReadUserDto, user);
   }
 
-  async getAll(): Promise<User[]> {
+  async getAll(): Promise<ReadUserDto[]> {
     const users: User[] = await this._userRepository.findBy({
       status: StatusType.ACTIVE,
     });
 
-    return users;
+    return users.map((user: User) => plainToInstance(ReadUserDto, user));
   }
 
-  async create(user: User): Promise<User> {
-    const details = new UserDetails();
-    user.details = details;
-
-    const defaultRole = await this._roleRepository.findOneBy({
-      name: 'GENERAL',
+  async update(userId: number, user: UpdateUserDto): Promise<ReadUserDto> {
+    const foundUser = await this._userRepository.findOneBy({
+      id: userId,
+      status: StatusType.ACTIVE,
     });
-    user.roles = [defaultRole];
 
-    const savedUser: User = await this._userRepository.save(user);
-    return savedUser;
+    if (!foundUser) {
+      throw new NotFoundException('User does not exist');
+    }
+
+    foundUser.username = user.username;
+    const updatedUser = await this._userRepository.save(foundUser);
+    return plainToInstance(ReadUserDto, updatedUser);
   }
 
-  async update(id: number, user: User): Promise<void> {
-    await this._userRepository.update(id, user);
-  }
-
-  async delete(id: number): Promise<void> {
+  async delete(userId: number): Promise<void> {
     const userExists = await this._userRepository.findOneBy({
+      id: userId,
       status: StatusType.ACTIVE,
     });
 
     if (!userExists) {
       throw new NotFoundException();
     }
-    await this._userRepository.update(id, { status: StatusType.INACTIVE });
+    await this._userRepository.update(userId, { status: StatusType.INACTIVE });
   }
 
-  async setRoleToUser(userId: number, roleId: number) {
+  async setRoleToUser(userId: number, roleId: number): Promise<boolean> {
     const userExist = await this._userRepository.findOneBy({
       id: userId,
       status: StatusType.ACTIVE,
