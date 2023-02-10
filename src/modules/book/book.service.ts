@@ -55,7 +55,7 @@ export class BookService {
 
     const books: Book[] = await this._bookRepository.findBy({
       status: StatusType.ACTIVE,
-      authors: In([authorId]),
+      authors: In[authorId],
     });
 
     return books.map((book) => plainToInstance(ReadBookDto, book));
