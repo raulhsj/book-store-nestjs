@@ -1,15 +1,8 @@
-import { StatusType } from '../../shared/statustype.enum';
-import {
-  BaseEntity,
-  Column,
-  CreateDateColumn,
-  Entity,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { CreationDate } from '../../shared/creationDate.entity';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('user_details')
-export class UserDetails extends BaseEntity {
+export class UserDetails extends CreationDate {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
@@ -18,13 +11,4 @@ export class UserDetails extends BaseEntity {
 
   @Column({ type: 'varchar', nullable: true })
   lastname: string;
-
-  @Column({ type: 'varchar', default: StatusType.ACTIVE, length: 8 })
-  status: string;
-
-  @CreateDateColumn({ type: 'timestamp', name: 'created_at', nullable: true })
-  createdAt: Date;
-
-  @UpdateDateColumn({ type: 'timestamp', name: 'updated_at', nullable: true })
-  updatedAt: Date;
 }

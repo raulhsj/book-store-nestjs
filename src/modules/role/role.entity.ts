@@ -1,18 +1,15 @@
 import {
-  BaseEntity,
   Column,
-  CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToMany,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
 } from 'typeorm';
 import { User } from '../user/user.entity';
-import { StatusType } from '../../shared/statustype.enum';
+import { CreationDate } from '../../shared/creationDate.entity';
 
 @Entity('roles')
-export class Role extends BaseEntity {
+export class Role extends CreationDate {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
@@ -25,13 +22,4 @@ export class Role extends BaseEntity {
   @ManyToMany((type) => User, (user) => user.roles)
   @JoinColumn()
   users: User[];
-
-  @Column({ type: 'varchar', default: StatusType.ACTIVE, length: 8 })
-  status: string;
-
-  @CreateDateColumn({ type: 'timestamp', name: 'created_at' })
-  createdAt: Date;
-
-  @UpdateDateColumn({ type: 'timestamp', name: 'updated_at' })
-  updatedAt: Date;
 }

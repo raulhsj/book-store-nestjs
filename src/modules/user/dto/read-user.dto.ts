@@ -1,7 +1,7 @@
 import { IsEmail, IsNumber, IsString } from 'class-validator';
 import { ReadUserDetailsDto } from './read-user-details.dto';
 import { Exclude, Expose, Type } from 'class-transformer';
-import { ReadRoleDto } from 'src/modules/role/dtos';
+import { ReadRoleDto } from '../../role/dtos';
 
 @Exclude()
 export class ReadUserDto {

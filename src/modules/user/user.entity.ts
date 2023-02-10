@@ -1,21 +1,20 @@
 import {
-  BaseEntity,
   Column,
-  CreateDateColumn,
   Entity,
   JoinColumn,
   JoinTable,
   ManyToMany,
   OneToOne,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
 } from 'typeorm';
 import { UserDetails } from './user.details.entity';
 import { Role } from '../role/role.entity';
 import { StatusType } from '../../shared/statustype.enum';
+import { CreationDate } from '../../shared/creationDate.entity';
+import { Book } from '../book/book.entity';
 
 @Entity('users')
-export class User extends BaseEntity {
+export class User extends CreationDate {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
@@ -28,7 +27,7 @@ export class User extends BaseEntity {
   @Column({ type: 'varchar', default: StatusType.ACTIVE })
   password: string;
 
-  @OneToOne((type) => UserDetails, {
+  @OneToOne(() => UserDetails, {
     cascade: true,
     nullable: false,
     eager: true,
@@ -36,16 +35,11 @@ export class User extends BaseEntity {
   @JoinColumn({ name: 'detail_id' })
   details: UserDetails;
 
-  @ManyToMany((type) => Role, (role) => role.users, { eager: true })
+  @ManyToMany(() => Role, (role) => role.users, { eager: true })
   @JoinTable({ name: 'user_roles' })
   roles: Role[];
 
-  @Column({ type: 'varchar', default: StatusType.ACTIVE, length: 8 })
-  status: string;
-
-  @CreateDateColumn({ type: 'timestamp', name: 'created_at' })
-  createdAt: Date;
-
-  @UpdateDateColumn({ type: 'timestamp', name: 'updated_at' })
-  updatedAt: Date;
+  @ManyToMany(() => Book, (book) => book.authors)
+  @JoinTable({ name: 'user_books' })
+  books: Book[];
 }
