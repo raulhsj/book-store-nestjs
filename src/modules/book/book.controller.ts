@@ -16,6 +16,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { RoleGuard } from '../role/guards/role/role.guard';
 import { Roles } from '../role/decorators/role.decorator';
 import { GetUser } from '../auth/user.decorator';
+import { Role } from '../role/role.entity';
 
 @Controller('book')
 export class BookController {
@@ -45,26 +46,20 @@ export class BookController {
     return this._bookService.create(book);
   }
 
-  @Post()
+  @Patch(':bookId')
   @Roles(RoleType.AUTHOR)
   @UseGuards(AuthGuard(), RoleGuard)
-  createBookByAuthor(
-    @Body() book: Partial<CreateBookDto>,
-    @GetUser('id') authorId: number,
-  ): Promise<ReadBookDto> {
-    return this._bookService.createByAuthor(book, authorId);
-  }
-
-  @Patch(':bookId')
-  updateBook(
+  async updateBook(
     @Param('bookId', ParseIntPipe) bookId: number,
     @Body() book: Partial<CreateBookDto>,
     @GetUser('id') authorId: number,
-  ): Promise<ReadBookDto> {
+  ): Promise<void> {
     return this._bookService.update(bookId, book, authorId);
   }
 
   @Delete(':bookId')
+  @Roles(RoleType.AUTHOR, RoleType.ADMIN)
+  @UseGuards(AuthGuard(), RoleGuard)
   deleteBook(@Param('bookId', ParseIntPipe) bookId: number): Promise<void> {
     return this._bookService.delete(bookId);
   }

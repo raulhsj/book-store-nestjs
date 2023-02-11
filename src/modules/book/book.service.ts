@@ -95,37 +95,11 @@ export class BookService {
     return plainToInstance(ReadBookDto, savedBook);
   }
 
-  async createByAuthor(
-    book: Partial<CreateBookDto>,
-    authorId: number,
-  ): Promise<ReadBookDto> {
-    const author = await this._userRepository.findOneBy({
-      id: authorId,
-      status: StatusType.INACTIVE,
-    });
-
-    const isAuthor = author.roles.some(
-      (role: Role) => role.name === RoleType.AUTHOR,
-    );
-
-    if (!isAuthor) {
-      throw new UnauthorizedException(`${authorId} is not an author`);
-    }
-
-    const savedBook: Book = await this._bookRepository.save({
-      title: book.title,
-      description: book.description,
-      author,
-    });
-
-    return plainToInstance(ReadBookDto, savedBook);
-  }
-
   async update(
     bookId: number,
     book: Partial<UpdateBookDto>,
     authorId: number,
-  ): Promise<ReadBookDto> {
+  ): Promise<void> {
     const bookExists: Book = await this._bookRepository.findOneBy({
       id: bookId,
       status: StatusType.ACTIVE,
@@ -142,8 +116,7 @@ export class BookService {
       throw new UnauthorizedException(`${authorId} isn't the book's author`);
     }
 
-    const updatedBook = await this._bookRepository.update(bookId, book);
-    return plainToInstance(ReadBookDto, updatedBook);
+    await this._bookRepository.update(bookId, book);
   }
 
   async delete(bookId: number): Promise<void> {
